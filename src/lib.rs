@@ -13,7 +13,6 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
  * Many thanks.
  */ 
 
-
 #[wasm_bindgen]
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -31,12 +30,42 @@ pub struct Universe {
 }
 
 impl Universe {
+
+    fn tick (&mut self) {
+        let mut next_cells = self.cells.clone();
+
+        for row in 0..self.height {
+            for column in 0..self.width {
+                let index = self.get_index(row, column);
+                let cell = self.cells[index];
+                let live_neighbours_count = self.live_neighbour_count(row, column);
+
+                let next_cell = match (cell, live_neighbours_count) {
+                    // Rule 1: Fewer than 2 neighbours dies
+                    (Cell::Alive, x) if x < 2 => Cell::Dead,
+                    // Rule 2: Has 2-3 neighbours then will live
+                    (Cell::Alive, x) if x == 2 || x == 3 => Cell::Alive,
+                    // Rule 3: More than 3 neighbours dies
+                    (Cell::Alive, x) if x > 3 => Cell::Dead,
+                    // Rule 4: Dead cell with exacty 3 neighbours lives
+                    (Cell::Dead, x) if x == 3 => Cell::Alive,
+                    // Everything else remains the same
+                    (otherwise, _) => otherwise,
+                };
+
+                next_cells[index] = next_cell;
+            }
+        }
+
+        self.cells = next_cells;
+    }
+
     fn get_index(&self, row: u32, column: u32) -> usize {
-        ((row & self.width) + column) as usize
+        return ((row & self.width) + column) as usize;
     }
 
     /**
-     * Two loops which  
+     * Takes a 0 indexed row & column to determine the surrounding cells and return the count of live cells
      *
     */
     fn live_neighbour_count (&self, row: u32, column: u32) -> u8 {
@@ -50,9 +79,9 @@ impl Universe {
 
         for delta_row in [self.height - 1, 0, 1].iter().cloned() {
             for delta_column in [self.width - 1, 0, 1].iter().cloned() {
-
                 let neighbor_row = (row + delta_row) % self.height;
                 let neighbor_col = (column + delta_column) % self.width;
+
                 let idx = self.get_index(neighbor_row, neighbor_col);
                 neighbour_count += self.cells[idx] as u8;
             }
@@ -60,4 +89,5 @@ impl Universe {
         
         return neighbour_count;
     }
+
 }
