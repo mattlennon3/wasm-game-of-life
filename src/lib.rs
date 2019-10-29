@@ -1,6 +1,7 @@
 mod utils;
 
 use wasm_bindgen::prelude::*;
+use std::fmt;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -31,7 +32,32 @@ pub struct Universe {
 
 impl Universe {
 
-    fn tick (&mut self) {
+    pub fn new() -> Universe {
+        let width = 64;
+        let height = 64;
+
+        let cells = (0..width * height)
+            .map(|i| {
+                if i % 2 == 0 || i % 7 == 0 {
+                    Cell::Alive
+                } else {
+                    Cell::Dead
+                }
+            })
+            .collect();
+
+        return Universe {
+            width,
+            height,
+            cells
+        }
+    }
+
+    pub fn render(&self) -> String {
+        return self.to_string();
+    }
+
+    fn tick(&mut self) {
         let mut next_cells = self.cells.clone();
 
         for row in 0..self.height {
@@ -90,4 +116,16 @@ impl Universe {
         return neighbour_count;
     }
 
+}
+
+impl fmt::Display for Universe {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for line in self.cells.as_slice().chunks(self.width as usize ) {
+            for &cell in line {
+                let symbol = if cell == Cell::Dead { '◻' } else { '◼' };
+                write!(f, "{}", symbol);
+            }
+        }
+        Ok(());
+    }
 }
