@@ -30,11 +30,12 @@ pub struct Universe {
     cells: Vec<Cell>,
 }
 
+#[wasm_bindgen]
 impl Universe {
 
     pub fn new() -> Universe {
-        let width = 64;
-        let height = 64;
+        let width = 8;
+        let height = 8;
 
         let cells = (0..width * height)
             .map(|i| {
@@ -57,7 +58,7 @@ impl Universe {
         return self.to_string();
     }
 
-    fn tick(&mut self) {
+    pub fn tick(&mut self) {
         let mut next_cells = self.cells.clone();
 
         for row in 0..self.height {
@@ -123,9 +124,10 @@ impl fmt::Display for Universe {
         for line in self.cells.as_slice().chunks(self.width as usize ) {
             for &cell in line {
                 let symbol = if cell == Cell::Dead { '◻' } else { '◼' };
-                write!(f, "{}", symbol);
+                write!(f, "{}", symbol)?;
             }
+            write!(f, "\n")?;
         }
-        Ok(());
+        return Ok(());
     }
 }
