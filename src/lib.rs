@@ -34,8 +34,8 @@ pub struct Universe {
 impl Universe {
 
     pub fn new() -> Universe {
-        let width = 8;
-        let height = 8;
+        let width = 64;
+        let height = 64;
 
         let cells = (0..width * height)
             .map(|i| {
@@ -67,6 +67,10 @@ impl Universe {
                 let cell = self.cells[index];
                 let live_neighbours_count = self.live_neighbour_count(row, column);
 
+                // use web_sys::console;
+                // let js: JsValue = live_neighbours_count.into();
+                // console::log_2(&"Live count: ".into(), &js);
+
                 let next_cell = match (cell, live_neighbours_count) {
                     // Rule 1: Fewer than 2 neighbours dies
                     (Cell::Alive, x) if x < 2 => Cell::Dead,
@@ -80,6 +84,8 @@ impl Universe {
                     (otherwise, _) => otherwise,
                 };
 
+                // next_cell = Cell::Alive;
+
                 next_cells[index] = next_cell;
             }
         }
@@ -88,7 +94,7 @@ impl Universe {
     }
 
     fn get_index(&self, row: u32, column: u32) -> usize {
-        return ((row & self.width) + column) as usize;
+        return (row * self.width + column) as usize;
     }
 
     /**
@@ -106,6 +112,9 @@ impl Universe {
 
         for delta_row in [self.height - 1, 0, 1].iter().cloned() {
             for delta_column in [self.width - 1, 0, 1].iter().cloned() {
+                if delta_row == 0 && delta_column == 0 {
+                    continue;
+                }
                 let neighbor_row = (row + delta_row) % self.height;
                 let neighbor_col = (column + delta_column) % self.width;
 
