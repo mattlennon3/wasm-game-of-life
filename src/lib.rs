@@ -1,6 +1,7 @@
 mod utils;
 
 use wasm_bindgen::prelude::*;
+use rand::prelude::*;
 use std::fmt;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -33,11 +34,49 @@ pub struct Universe {
 #[wasm_bindgen]
 impl Universe {
 
-    pub fn new() -> Universe {
-        let width = 64;
-        let height = 64;
+    pub fn new(width: u32, height: u32) -> Universe {
+//        let width = 64;
+//        let height = 64;
 
-        let cells = (0..width * height)
+        let cells: Vec<Cell> = Vec::new();
+        return Universe {
+            width,
+            height,
+            cells
+        }
+    }
+
+    pub fn with_odd_columns_start(&mut self) {
+        let cells = (0..self.width * self.height)
+            .map(|i| {
+                if i == 0 {
+                    Cell::Dead
+                } else if i % 2 == 0 {
+                    Cell::Alive
+                } else {
+                    Cell::Dead
+                }
+            })
+            .collect();
+        self.cells = cells;
+    }
+//
+//    pub fn with_50_50_start(&mut self) {
+//        let cells = (0..self.width * self.height)
+//            .map(|i| {
+//                let r = rand::random::<bool>();
+//                if r {
+//                    Cell::Dead
+//                } else {
+//                    Cell::Alive
+//                }
+//            })
+//            .collect();
+//        self.cells = cells;
+//    }
+
+    pub fn with_interesting_start(&mut self) {
+        let cells = (0..self.width * self.height)
             .map(|i| {
                 if i % 2 == 0 || i % 7 == 0 {
                     Cell::Alive
@@ -46,12 +85,7 @@ impl Universe {
                 }
             })
             .collect();
-
-        return Universe {
-            width,
-            height,
-            cells
-        }
+        self.cells = cells;
     }
 
     pub fn render(&self) -> String {

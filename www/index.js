@@ -6,9 +6,12 @@ const grid_colour =  '#CCCCCC';
 const dead_colour =  '#FFFFFF';
 const alive_colour = '#000000';
 
-const universe = Universe.new();
+const universe = Universe.new(64, 64);
 const width = universe.width();
 const height = universe.height();
+
+universe.with_interesting_start();
+// universe.with_50_50_start();
 
 const canvas = document.getElementById('game-of-life-canvas');
 canvas.height = ((cell_size + 1) * height) + 1;
@@ -65,7 +68,7 @@ const drawCells = () => {
                 row * (cell_size + 1) + 1,
                 cell_size,
                 cell_size
-            )
+            );
         }
     }
 
