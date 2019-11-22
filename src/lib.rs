@@ -126,6 +126,16 @@ impl Universe {
         return neighbour_count;
     }
 
+    pub fn width(&self) -> u32 {
+        return self.width;
+    }
+    pub fn height(&self) -> u32 {
+        return self.height;
+    }
+    pub fn cells(&self) -> *const Cell {
+        return self.cells.as_ptr();
+    }
+
 }
 
 impl fmt::Display for Universe {
